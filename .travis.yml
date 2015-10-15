@@ -1,0 +1,25 @@
+language: go
+go:
+- 1.5.1
+cache:
+  directories:
+  - Godeps/_workspace
+install:
+- make deps
+script:
+- make test
+before_deploy:
+- make
+- mkdir -p $HOME/dist/binaries/slackroom/$TRAVIS_COMMIT
+- cp bin/* $HOME/dist/binaries/slackroom/$TRAVIS_COMMIT
+deploy:
+  provider: s3
+  access_key_id: AKIAJUAHDX7RQOSJQWVA
+  secret_access_key:
+      secure: ULG/ASN5vBbOYYbhua3/ZOCpdNNn379QRSnrVhmQX2QAzqyk2Q8LYa1/NsqUFfXZcJ4KXE9H7EN+PL3RJ4LmY/zB20KUZqFbNuso75WmMsQK79KLIysszJ1oe5kbEGLIMWavc6DorjYlJ3f0Gu35WTVadQdwoXzm6w0+doe29nvAXIeG20yFiX8jhLofyvwAlWMspf/2lOHdyLKb4jTYFnhylrykrFhcKqOwiDo0zLvmTmzoTvqxyXbvVWyhQw90IbN/dAj86k/7r7mvB1gEF537xu9+Era/u0TVJxpqxKDvPg5kCVocOZgUt4qJ7AC1UZs8/+KFtqBtCSxZeHEvW+B78XBG7MT7DwGoB1PL54paUaWvQCNJbwa3z25zWwyugzRVrh5Zp/SPD5am71WZfmDTpJc769nglpHTKWDAVkSpwK2M6hfL0jEhK+jj3bjudMbVOY/rei9MLQuKEXzZWi1f3PnwmvBiyINoAV9qK8gln5o0m570bLLFNTdBsIe3KoyTv9aYRtWu59NIsOLX0D7X04DHDem9iBECVCJsqowuT1RlWtlWYulrP75SbANKaqAxQSz6pxtq7ZGjSXRkTZRWQpH2/bf/kCBRINRKddKVhqLVDIVdOKgUsOQqAlgd/jULSJW+V6Scp/nq7CDspa0wJqzkv7d9IWdEgCuRozc=
+  bucket: movableink-apps
+  local-dir: "$HOME/dist"
+  acl: private
+  on:
+    go: 1.5.1
+    all_branches: true
