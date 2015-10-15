@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/movableink/slackroom",
+	"GoVersion": "go1.4.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "ad4d7a5882b961e07e2626045eb995c022ac6664"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "47990a1ba55743e6ef1affd3a14e5bac8553615d"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "2fbf3d7329d847b125188ad64b68cfb1f548938a"
+		},
+		{
+			"ImportPath": "google.golang.org/api/calendar/v3",
+			"Rev": "7f3774db0aa426a2390fa9abcccbc272dbb93111"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi",
+			"Rev": "7f3774db0aa426a2390fa9abcccbc272dbb93111"
+		},
+		{
+			"ImportPath": "google.golang.org/api/internal",
+			"Rev": "7f3774db0aa426a2390fa9abcccbc272dbb93111"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/compute/metadata",
+			"Rev": "9fdfebf8027334a2f0f583591507f08b0ab166d8"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/internal",
+			"Rev": "9fdfebf8027334a2f0f583591507f08b0ab166d8"
+		}
+	]
+}
