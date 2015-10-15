@@ -14,26 +14,24 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
-type CalendarClient interface {
-	QuickBook()
-	SetAvaliableRooms()
+type Calendar struct {
+	service *calendar.Service
+	roomMap map[string]string
 }
 
-type Service struct {
-	calendar *calendar.Service
-}
-
-func NewCalendarService() *Service {
+func NewCalendarService() *Calendar {
 	ctx := context.Background()
 
-	b, err := ioutil.ReadFile("/Users/ericcook/go/src/github.com/movableink/slackroom/bin/client_secret.json")
+	b, err := ioutil.ReadFile("/Users/ericcook/go/src/github.com/movableink/slackroom/client_secret.json")
 
-	config, err := google.ConfigFromJSON(b, calendar.CalendarScope)
+	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
 
 	cacheFile, err := tokenCacheFile()
+
 	tok, err := tokenFromFile(cacheFile)
 	if err != nil {
 		tok = getTokenFromWeb(config)
@@ -42,13 +40,28 @@ func NewCalendarService() *Service {
 
 	client := getClient(ctx, config)
 
-	calendar, err := calendar.New(client)
+	service, err := calendar.New(client)
 	if err != nil {
 		log.Fatalf("Unable to retrieve calendar Client %v", err)
 		return nil
 	}
 
-	return &Service{calendar: calendar}
+	roomMap := make(map[string]string)
+	listRes, err := service.CalendarList.List().Fields("items").Do()
+
+	if err != nil {
+		log.Fatalf("Unable to find calendars %v", err)
+	}
+
+	log.Printf("%s", listRes.Items)
+
+	for _, item := range listRes.Items {
+		if strings.Contains(item.Summary, "MI Room") {
+			roomMap[item.Id] = item.Summary
+		}
+	}
+
+	return &Calendar{service: service, roomMap: roomMap}
 }
 
 func saveToken(file string, token *oauth2.Token) {
@@ -98,6 +111,8 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 }
 
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+	log.Printf("retrieving new token")
+
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
@@ -113,37 +128,34 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	}
 	return tok
 }
-func (srv *Service) QuickBook(room string) string {
-	res := srv.calendar.Events.QuickAdd(room, "booked by eric")
-	log.Printf("Unable to book", res)
-	return "booked"
-}
 
-func (srv *Service) GetAvaliableRooms() string {
-	listRes, err := srv.calendar.CalendarList.List().Fields("items(id)").Do()
-	if err != nil {
-		log.Fatalf("Unable to find calendars %v", err)
+// func (srv *Calendar) QuickBook(room string) string {
+// 	res := srv.service.Events.QuickAdd(room, "booked by eric")
+// 	log.Printf("Unable to book", res)
+// 	return "booked"
+// }
+
+func (srv *Calendar) GetAvaliableRooms() string {
+	var requestItem []*calendar.FreeBusyRequestItem
+	log.Printf("%s", srv.roomMap)
+
+	for k, _ := range srv.roomMap {
+		item := &calendar.FreeBusyRequestItem{Id: k}
+		requestItem = append(requestItem, item)
 	}
 
-	var calIds []*calendar.FreeBusyRequestItem
-
-	for _, v := range listRes.Items {
-		item := &calendar.FreeBusyRequestItem{Id: v.Id}
-		calIds = append(calIds, item)
-	}
-
-	if len(calIds) > 0 {
+	if len(requestItem) > 0 {
 		now := time.Now()
-		later := now.Add(30 * time.Minute)
+		later := now.Add(15 * time.Minute)
 
 		request := &calendar.FreeBusyRequest{
 			TimeMin:  now.Format(time.RFC3339),
 			TimeMax:  later.Format(time.RFC3339),
 			TimeZone: "EST",
-			Items:    calIds,
+			Items:    requestItem,
 		}
 
-		res, err := srv.calendar.Freebusy.Query(request).Do()
+		res, err := srv.service.Freebusy.Query(request).Do()
 
 		if err != nil {
 			log.Fatalf("Unable to query Freebusy %v", err)
@@ -152,7 +164,7 @@ func (srv *Service) GetAvaliableRooms() string {
 		var avaliable string
 		for k, c := range res.Calendars {
 			if len(c.Busy) == 0 {
-				avaliable = avaliable + " " + k + "\n"
+				avaliable = avaliable + " " + (srv.roomMap)[k]
 			}
 		}
 
@@ -160,5 +172,5 @@ func (srv *Service) GetAvaliableRooms() string {
 			return string(avaliable)
 		}
 	}
-	return "no"
+	return "none"
 }
