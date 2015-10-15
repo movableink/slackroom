@@ -4,7 +4,7 @@ default: bin
 
 bin:
 	mkdir -p bin
-	go build -i -o ./bin/$(APP_NAME)
+	godep build -i -o ./bin/$(APP_NAME)
 
 test:
 	godep go test -timeout=10s -v
