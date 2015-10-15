@@ -6,8 +6,6 @@ cache:
   - Godeps/_workspace
 install:
 - make deps
-script:
-- make test
 before_deploy:
 - make
 - mkdir -p $HOME/dist/binaries/slackroom/$TRAVIS_COMMIT
