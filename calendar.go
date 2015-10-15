@@ -26,7 +26,7 @@ type Calendar struct {
 func NewCalendarService() *Calendar {
 	ctx := context.Background()
 
-	b, err := ioutil.ReadFile("/Users/ericcook/go/src/github.com/movableink/slackroom/client_secret.json")
+	b, err := ioutil.ReadFile("/home/deploy/apps/slackroom/client_secret.json")
 
 	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
 
