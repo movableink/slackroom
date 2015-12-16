@@ -164,7 +164,7 @@ func (srv *Calendar) GetAvaliableRooms() string {
 		var avaliable string
 		for k, c := range res.Calendars {
 			if len(c.Busy) == 0 {
-				avaliable = avaliable + " " + (srv.roomMap)[k]
+				avaliable = avaliable + "\n" + (srv.roomMap)[k]
 			}
 		}
 
