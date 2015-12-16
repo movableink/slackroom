@@ -28,7 +28,14 @@ func NewCalendarService() *Calendar {
 
 	b, err := ioutil.ReadFile("/home/deploy/apps/slackroom/client_secret.json")
 
+	if err != nil {
+		log.Fatalf("no config file %v", err)
+	}
+
 	config, err := google.ConfigFromJSON(b, calendar.CalendarReadonlyScope)
+	if err != nil {
+		log.Fatalf("cant configure %v", err)
+	}
 
 	cacheFile, err := tokenCacheFile()
 
