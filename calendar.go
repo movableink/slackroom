@@ -136,12 +136,6 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	return tok
 }
 
-// func (srv *Calendar) QuickBook(room string) string {
-// 	res := srv.service.Events.QuickAdd(room, "booked by eric")
-// 	log.Printf("Unable to book", res)
-// 	return "booked"
-// }
-
 func (srv *Calendar) GetAvaliableRooms() string {
 	var requestItem []*calendar.FreeBusyRequestItem
 	log.Printf("%s", srv.roomMap)
